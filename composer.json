@@ -1,0 +1,22 @@
+{
+	"name": "codeandgraphics/walletone",
+	"license": "MIT",
+	"description": "WalletOne API PHP implementation",
+	"authors": [
+		{
+			"name": "George Viazemsky",
+			"email": "code@and.graphics"
+		}
+	],
+	"require": {
+		"php": ">=5.5.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"CodeAndGraphics\\WalletOne\\": "./"
+		}
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^6.0"
+	}
+}
