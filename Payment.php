@@ -1,8 +1,6 @@
 <?php
 namespace CodeAndGraphics\WalletOne;
 
-use CodeAndGraphics\WalletOne\Exception\ValidationFailedException;
-
 class Payment {
 
 	const DATE_FORMAT = 'Y-m-d\TH:i:s';
@@ -178,6 +176,7 @@ class Payment {
 			$data[] = $value;
 		}
 		$data[] = $this->key;
+
 		$data = implode("", $data);
 
 		if($this->utf8) {
@@ -244,7 +243,7 @@ class Payment {
 			return false;
 		}
 		if((int) $this->merchantId !== (int) $data['WMI_MERCHANT_ID']) {
-			$this->_message = 'Merchants don\'t match';
+			$this->_message = 'Merchants doesn\'t match';
 			return false;
 		}
 		if(empty($data['WMI_SIGNATURE'])) {
@@ -257,7 +256,7 @@ class Payment {
 		$calculatedSignature = $this->getSignature($data);
 
 		if($calculatedSignature !== $origSignature) {
-			$this->_message = 'Signatures don\'t match';
+			$this->_message = 'Signatures doesn\'t match';
 			return false;
 		}
 
@@ -288,7 +287,7 @@ class Payment {
 				$this->customParameters[$k] = $v;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -301,6 +300,16 @@ class Payment {
 		if($message) {
 			$res .= '&WMI_DESCRIPTION='.urlencode($message);
 		}
+		return $res;
+	}
+
+	/**
+	 * @param string $message
+	 * @return string
+	 */
+	public function getRetryAnswer($message = '') {
+		$res = 'WMI_RESULT=RETRY';
+		$res .= '&WMI_DESCRIPTION=' . urlencode($message ? : $this->_message);
 		return $res;
 	}
 }
