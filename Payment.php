@@ -30,7 +30,9 @@ class Payment {
 
 	private $customParameters = [];
 
-	public $utf8 = false;
+	private $_message = false;
+
+	public $utf8 = true;
 
 	public function __construct($merchantId, $key = "") {
 		$this->merchantId = $merchantId;
@@ -129,8 +131,16 @@ class Payment {
 		return $this->state;
 	}
 
+	public function getCustomParameters() {
+		return $this->customParameters;
+	}
+
 	public function setCustomParameters($customParameters) {
 		$this->customParameters = $customParameters;
+	}
+
+	public function getMessage() {
+		return $this->_message;
 	}
 
 	/**
@@ -225,18 +235,21 @@ class Payment {
 	}
 
 	/**
-	 * @param array $data
-	 * @throws ValidationFailedException
+	 * @param $data
+	 * @return bool
 	 */
 	public function validate($data) {
 		if(empty($data['WMI_MERCHANT_ID'])) {
-			throw new ValidationFailedException('WMI_MERCHANT_ID is not specified');
+			$this->_message = 'WMI_MERCHANT_ID is not specified';
+			return false;
 		}
 		if((int) $this->merchantId !== (int) $data['WMI_MERCHANT_ID']) {
-			throw new ValidationFailedException('Merchants don\'t match');
+			$this->_message = 'Merchants don\'t match';
+			return false;
 		}
 		if(empty($data['WMI_SIGNATURE'])) {
-			throw new ValidationFailedException('WMI_SIGNATURE is not specified');
+			$this->_message = 'WMI_SIGNATURE is not specified';
+			return false;
 		}
 		$origSignature = $data['WMI_SIGNATURE'];
 		unset($data['WMI_SIGNATURE']);
@@ -244,7 +257,8 @@ class Payment {
 		$calculatedSignature = $this->getSignature($data);
 
 		if($calculatedSignature !== $origSignature) {
-			throw new ValidationFailedException('Signatures don\'t match');
+			$this->_message = 'Signatures don\'t match';
+			return false;
 		}
 
 		$fieldsMap = [
@@ -274,6 +288,8 @@ class Payment {
 				$this->customParameters[$k] = $v;
 			}
 		}
+		
+		return true;
 	}
 
 	/**
